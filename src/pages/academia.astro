@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { whatsappLink } from '../config';
+
+const cursos = [
+  { nombre: 'Barismo', detalle: 'Barismo Básico: módulos, qué incluye y horarios.' },
+  { nombre: 'Catación', detalle: '[por definir]' },
+  { nombre: 'Tueste', detalle: '[por definir]' },
+];
+---
+<Layout
+  title="Academia | Cursos de barismo, catación y tueste | Cafetonato"
+  description="Cursos de barismo, catación y tueste con profesores certificados por la SCA. Inscríbete por WhatsApp."
+>
+  <main class="academia">
+    <h1>Academia</h1>
+    <div class="cursos">
+      {cursos.map((c) => (
+        <article class="curso">
+          <h2>{c.nombre}</h2>
+          <p>{c.detalle}</p>
+        </article>
+      ))}
+    </div>
+    <a class="boton" href={whatsappLink()} target="_blank" rel="noopener">Contactar WhatsApp</a>
+    <a class="volver" href="/">← Volver al inicio</a>
+  </main>
+</Layout>
+
+<style>
+  .academia {
+    min-height: 100svh;
+    padding: 80px var(--margen-x);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+  }
+  h1 { font-size: 85px; font-family: var(--fuente-titulos); font-weight: 700; line-height: 1; }
+  .cursos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; width: 100%; }
+  .curso { border: 1px solid rgb(255 255 255 / .25); border-radius: 12px; padding: 32px 24px; min-height: 280px; }
+  .curso h2 { font-size: 28px; font-weight: 400; color: var(--orange); margin-bottom: 12px; }
+  .volver { color: var(--blanco); opacity: .8; }
+  @media (max-width: 767px) {
+    h1 { font-size: 56px; }
+    .cursos { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,51 @@
+@import '@fontsource/montserrat/400.css';
+@import '@fontsource/montserrat/600.css';
+@import '@fontsource/montserrat/700.css';
+@import '@fontsource/nunito/400.css';
+
+:root {
+  --orange: #e7650b;
+  --verde: #2e4021;
+  --blanco: #ffffff;
+  --fuente-titulos: 'Montserrat', system-ui, sans-serif;
+  --fuente-texto: 'Nunito', system-ui, sans-serif;
+  --margen-x: 105px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+/* Scroll snap: el navegador "imanta" cada sección al borde de la pantalla */
+html.snap { scroll-snap-type: y mandatory; }
+
+body {
+  margin: 0;
+  font-family: var(--fuente-texto);
+  color: var(--blanco);
+  background: var(--verde);
+}
+
+h1, h2, h3, p { margin: 0; }
+
+.boton {
+  display: inline-block;
+  font-family: var(--fuente-texto);
+  font-size: 18px;
+  color: var(--blanco);
+  background: var(--orange);
+  padding: 14px 46px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: transform .2s ease, filter .2s ease;
+}
+.boton:hover { transform: translateY(-2px); filter: brightness(1.1); }
+.boton:focus-visible { outline: 3px solid var(--blanco); outline-offset: 3px; }
+
+@media (max-width: 767px) {
+  :root { --margen-x: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}

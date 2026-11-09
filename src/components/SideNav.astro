@@ -1,0 +1,73 @@
+---
+interface Props {
+  secciones: { id: string; etiqueta: string }[];
+}
+const { secciones } = Astro.props;
+---
+<nav class="sidenav" aria-label="Secciones de la página">
+  <a class="sidenav__flecha" href="#" data-dir="-1" aria-label="Sección anterior">⌃</a>
+  {secciones.map((s, i) => (
+    <a class="sidenav__punto" href={`#${s.id}`} data-id={s.id} aria-label={s.etiqueta}>
+      {String(i + 1).padStart(2, '0')}
+    </a>
+  ))}
+  <a class="sidenav__flecha" href="#" data-dir="1" aria-label="Sección siguiente">⌄</a>
+</nav>
+
+<script>
+  const nav = document.querySelector('.sidenav')!;
+  const puntos = [...nav.querySelectorAll<HTMLAnchorElement>('.sidenav__punto')];
+  const secciones = puntos.map((p) => document.getElementById(p.dataset.id!)!);
+
+  // Marca como activo el punto de la sección que está en pantalla
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          puntos.forEach((p) => p.classList.toggle('activo', p.dataset.id === e.target.id));
+        }
+      });
+    },
+    { threshold: 0.6 },
+  );
+  secciones.forEach((s) => io.observe(s));
+
+  // Flechas: ir a la sección anterior / siguiente
+  nav.querySelectorAll<HTMLAnchorElement>('.sidenav__flecha').forEach((f) => {
+    f.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const actual = puntos.findIndex((p) => p.classList.contains('activo'));
+      const destino = Math.min(Math.max(actual + Number(f.dataset.dir), 0), secciones.length - 1);
+      secciones[destino].scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+
+<style>
+  .sidenav {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 64px;
+    background: rgb(0 0 0 / .35);
+  }
+  .sidenav a {
+    color: rgb(255 255 255 / .6);
+    text-decoration: none;
+    font-size: 14px;
+    padding: 14px 0;
+    width: 100%;
+    text-align: center;
+  }
+  .sidenav__flecha { font-size: 22px !important; }
+  .sidenav a:hover { color: #fff; }
+  .sidenav :global(.activo) { color: #fff; background: rgb(0 0 0 / .35); }
+
+  /* En móvil estorba: se oculta */
+  @media (max-width: 767px) { .sidenav { display: none; } }
+</style>

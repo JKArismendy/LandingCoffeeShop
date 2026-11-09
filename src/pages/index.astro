@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import HeroSnap from '../components/HeroSnap.astro';
+import SideNav from '../components/SideNav.astro';
+import heroAcademia from '../assets/hero-academia.jpg';
+import heroTienda from '../assets/hero-tienda.jpg';
+---
+<Layout
+  snap
+  title="Cafetonato: Academia | Coffe Shop"
+  description="Aprende barismo, catación y tueste con profesores certificados por la SCA. Próximamente: tienda de café, equipos y máquinas."
+>
+  <SideNav secciones={[{ id: 'academia', etiqueta: 'Academia' }, { id: 'tienda', etiqueta: 'Tienda' }]} />
+  <main>
+    <HeroSnap
+      id="academia"
+      principal
+      kicker="Cafetonato Academia de Café"
+      titulo="Domina el arte y la ciencia del café de especialidad"
+      subtitulo="Formación en Barismo, Catación y Tueste"
+      etiquetas={['100% Práctico', 'Certificación', 'Cupos Limitados']}
+      boton={{ texto: 'Ver Cursos y Fechas', href: '/academia' }}
+      imagen={heroAcademia}
+      alt="Aula de la Academia Cafetonato con máquina de espresso, mesa de trabajo y murales de café"
+    />
+    <HeroSnap
+      id="tienda"
+      kicker="Cafetonato Coffee Shop"
+      titulo="Equipos, máquinas y café para tu barra"
+      subtitulo="[texto por definir]"
+      boton={{ texto: 'Ver Tienda', href: '/tienda' }}
+      imagen={heroTienda}
+      alt="Tienda de café con máquinas de espresso, molinos, cafeteras y bolsas de café sobre un mostrador de madera"
+    />
+  </main>
+</Layout>

@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout
+  title="Tienda | Próximamente | Cafetonato"
+  description="Muy pronto: café, equipos y máquinas de Cafetonato."
+>
+  <main>
+    <h1>Tienda</h1>
+    <p>Próximamente. [mensaje por definir]</p>
+    <a class="boton" href="/">Volver al inicio</a>
+  </main>
+</Layout>
+
+<style>
+  main { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 24px; padding: 0 var(--margen-x); }
+  h1 { font-family: var(--fuente-titulos); font-size: 64px; font-weight: 700; }
+  p { font-size: 22px; }
+  @media (max-width: 767px) { h1 { font-size: 56px; } main { align-items: center; text-align: center; } }
+</style>
