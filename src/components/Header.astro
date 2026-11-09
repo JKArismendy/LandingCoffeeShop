@@ -41,13 +41,14 @@ import logo from '../assets/logo.svg';
 
 <style>
   .header {
+    --margin-x-desktop: 155px;
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 10;
     display: flex;
     justify-content: space-between; /* logo a la izquierda, menú a la derecha */
     align-items: center;
-    padding: 12px var(--margen-x); /* mismo margen lateral que el contenido del hero */
+    padding: 30px var(--margin-x-desktop) ; /* mismo margen lateral que el contenido del hero */
   }
 
   .header__logo img {
