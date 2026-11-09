@@ -41,14 +41,13 @@ import logo from '../assets/logo.svg';
 
 <style>
   .header {
-    --margin-x-desktop: 155px;
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 10;
     display: flex;
     justify-content: space-between; /* logo a la izquierda, menú a la derecha */
     align-items: center;
-    padding: 30px var(--margin-x-desktop) ; /* mismo margen lateral que el contenido del hero */
+    padding: 30px calc(var(--margen-x) + 35px); /* mismo margen lateral que el contenido del hero */
   }
 
   .header__logo img {
@@ -107,12 +106,12 @@ import logo from '../assets/logo.svg';
       right: 0;
       flex-direction: column;
       gap: 0;
-      background: rgb(0 0 0 / .9);
+      background: rgb(0, 0, 0, 0.582);
       padding: 8px var(--margen-x) 16px;
     }
     .header__nav a { font-size: 20px; padding: 14px 0; text-shadow: none; }
 
-    .header.abierto { background: rgb(0 0 0 / .9); }
+    .header.abierto { background: rgba(0, 0, 0, 0.582); }
     .header.abierto .header__nav { display: flex; }
 
     /* Las 3 rayas se convierten en una X */
