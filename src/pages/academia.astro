@@ -1,48 +1,134 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { whatsappLink } from '../config';
+import CursoPanel from '../components/CursoPanel.astro';
 
-const cursos = [
-  { nombre: 'Barismo', detalle: 'Barismo Básico: módulos, qué incluye y horarios.' },
-  { nombre: 'Catación', detalle: '[por definir]' },
-  { nombre: 'Tueste', detalle: '[por definir]' },
-];
+const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.';
 ---
 <Layout
   title="Academia | Cursos de barismo, catación y tueste | Cafetonato"
   description="Cursos de barismo, catación y tueste con profesores certificados por la SCA. Inscríbete por WhatsApp."
 >
   <main class="academia">
-    <h1>Academia</h1>
-    <div class="cursos">
-      {cursos.map((c) => (
-        <article class="curso">
-          <h2>{c.nombre}</h2>
-          <p>{c.detalle}</p>
-        </article>
-      ))}
-    </div>
-    <a class="boton" href={whatsappLink()} target="_blank" rel="noopener">Contactar WhatsApp</a>
-    <a class="volver" href="/">← Volver al inicio</a>
+    <h1 class="sr-only">Academia Cafetonato: cursos de barismo, catación y tueste</h1>
+
+    <CursoPanel
+      id="barismo"
+      titulo="Barismo"
+      resumen="Aprende técnicas de preparación de café, espresso, arte latte y servicio al cliente."
+      color="#2e4021"
+    >
+      <div class="extra__grupo">
+        <h3>Módulo teórico</h3>
+        <ul>
+          <li>Café verde</li>
+          <li>Impacto del tueste en taza</li>
+          <li>Aspecto sensorial del espresso</li>
+        </ul>
+      </div>
+      <div class="extra__grupo">
+        <h3>Módulo práctico</h3>
+        <ul>
+          <li>Calibración de espressos</li>
+          <li>Ratios y porcentajes</li>
+          <li>Práctica de calibración</li>
+        </ul>
+      </div>
+      <div class="extra__grupo">
+        <h3>Bebidas a base de leche</h3>
+        <ul>
+          <li>Texturización de la leche y sus variantes</li>
+          <li>Vertido y técnicas</li>
+          <li>Capuccinos, lattes y sus variantes</li>
+        </ul>
+      </div>
+      <div class="extra__grupo">
+        <h3>¿Qué incluye el curso?</h3>
+        <ul>
+          <li>Insumos y herramientas de estudio</li>
+          <li>Certificado avalado por la academia</li>
+          <li>Uniforme</li>
+        </ul>
+      </div>
+      <div class="extra__grupo">
+        <h3>Horarios y precio</h3>
+        <p>[por definir]</p>
+      </div>
+    </CursoPanel>
+
+    <CursoPanel id="catacion" titulo="Catación" resumen={lorem} color="#5a3a1e">
+      <div class="extra__grupo">
+        <h3>Módulos</h3>
+        <ul>
+          <li>Lorem ipsum dolor sit amet</li>
+          <li>Consectetur adipiscing elit</li>
+          <li>Sed do eiusmod tempor incididunt</li>
+        </ul>
+      </div>
+      <div class="extra__grupo">
+        <h3>¿Qué incluye el curso?</h3>
+        <p>Ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
+      </div>
+      <div class="extra__grupo">
+        <h3>Horarios y precio</h3>
+        <p>[por definir]</p>
+      </div>
+    </CursoPanel>
+
+    <CursoPanel id="tueste" titulo="Tueste" resumen={lorem} color="#7a2e12">
+      <div class="extra__grupo">
+        <h3>Módulos</h3>
+        <ul>
+          <li>Lorem ipsum dolor sit amet</li>
+          <li>Consectetur adipiscing elit</li>
+          <li>Sed do eiusmod tempor incididunt</li>
+        </ul>
+      </div>
+      <div class="extra__grupo">
+        <h3>¿Qué incluye el curso?</h3>
+        <p>Ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
+      </div>
+      <div class="extra__grupo">
+        <h3>Horarios y precio</h3>
+        <p>[por definir]</p>
+      </div>
+    </CursoPanel>
   </main>
 </Layout>
 
 <style>
+  /* La página mide exactamente el alto de la pantalla y se divide en 3.
+     Móvil: 3 bandas horizontales apiladas. Se deja libre arriba la altura del header (fijo)
+     para que no tape el primer panel; esa franja queda negra detrás del logo. */
   .academia {
+    --header-alto: calc(108px + env(safe-area-inset-top)); /* alto del header fijo en móvil */
+    /* min-height (no height): en móvil la página puede crecer cuando se abre un panel */
     min-height: 100svh;
-    padding: 80px var(--margen-x);
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 32px;
+    padding-top: var(--header-alto);
+    background: var(--negro);
   }
-  h1 { font-size: 85px; font-family: var(--fuente-titulos); font-weight: 700; line-height: 1; }
-  .cursos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; width: 100%; }
-  .curso { border: 1px solid rgb(255 255 255 / .25); border-radius: 12px; padding: 32px 24px; min-height: 280px; }
-  .curso h2 { font-size: 28px; font-weight: 400; color: var(--orange); margin-bottom: 12px; }
-  .volver { color: var(--blanco); opacity: .8; }
+  /* Móvil: el header es opaco para que el contenido no se mezcle con el logo al hacer scroll */
   @media (max-width: 767px) {
-    h1 { font-size: 56px; }
-    .cursos { grid-template-columns: 1fr; }
+    :global(.header) { background: var(--negro); }
+  }
+
+  /* Desktop: 3 columnas verticales de alto fijo; el header flota encima de ellas */
+  @media (min-width: 768px) {
+    .academia {
+      height: 100svh;
+      flex-direction: row;
+      padding-top: 0;
+    }
+  }
+
+  /* Texto solo para buscadores y lectores de pantalla (el <h1> sigue existiendo para SEO) */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 </style>

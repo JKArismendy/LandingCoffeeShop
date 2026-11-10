@@ -1,0 +1,223 @@
+---
+import { whatsappLink } from '../config';
+
+interface Props {
+  id: string;
+  titulo: string;
+  /** Frase corta, siempre visible (salvo cuando otro panel está abierto) */
+  resumen: string;
+  /** Color de fondo provisional (hasta que haya fotos) */
+  color: string;
+}
+const { id, titulo, resumen, color } = Astro.props;
+---
+<section id={id} class="panel" style={`--color-panel: ${color}`}>
+  <div class="panel__contenido">
+    <h2 class="panel__titulo">{titulo}</h2>
+
+    <div class="colapsable colapsable--resumen">
+      <div><p class="panel__resumen">{resumen}</p></div>
+    </div>
+
+    <!-- Información extendida: cerrada al inicio. `inert` evita que sus enlaces
+         reciban foco con el teclado mientras está oculta. -->
+    <div class="colapsable colapsable--extra" id={`${id}-extra`} inert>
+      <div class="panel__extra">
+        <slot />
+        <a
+          class="boton"
+          href={whatsappLink(`Hola, quiero información sobre el curso de ${titulo}`)}
+          target="_blank"
+          rel="noopener"
+        >
+          Contactar por WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <button
+      class="boton panel__toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls={`${id}-extra`}
+    >
+      Ver más
+    </button>
+  </div>
+</section>
+
+<script>
+  // Acordeón: solo un panel abierto a la vez. Astro incluye este script una sola vez,
+  // aunque el componente se use tres veces en la página.
+  const contenedor = document.querySelector<HTMLElement>('.academia')!;
+  const paneles = contenedor.querySelectorAll<HTMLElement>('.panel');
+
+  function setAbierto(panel: HTMLElement, abierto: boolean) {
+    const boton = panel.querySelector<HTMLButtonElement>('.panel__toggle')!;
+    const extra = panel.querySelector<HTMLElement>('.colapsable--extra')!;
+    panel.classList.toggle('abierto', abierto);
+    boton.setAttribute('aria-expanded', String(abierto));
+    boton.textContent = abierto ? 'Ver menos' : 'Ver más';
+    extra.inert = !abierto;
+    if (abierto) panel.scrollTop = 0;
+  }
+
+  paneles.forEach((panel) => {
+    const boton = panel.querySelector<HTMLButtonElement>('.panel__toggle')!;
+    boton.addEventListener('click', () => {
+      const abrir = !panel.classList.contains('abierto');
+      paneles.forEach((p) => setAbierto(p, p === panel && abrir));
+      contenedor.classList.toggle('hay-abierto', abrir);
+
+      // Móvil: los paneles se apilan y la página hace scroll, así que al terminar la animación
+      // se lleva el panel abierto a la parte superior de la pantalla.
+      if (abrir && window.matchMedia('(max-width: 767px)').matches) {
+        const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), reducido ? 0 : 720);
+      }
+    });
+  });
+</script>
+
+<style>
+  .panel {
+    /* flex: 1 → los 3 paneles se reparten el alto por igual.
+       Al abrirse pasa a flex-grow 4: crece a costa de los otros dos (efecto de alargamiento). */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+    padding: 0 var(--margen-x);
+    /* Si el contenido no cabe, el panel hace scroll (sin barra visible) en vez de recortar el botón */
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    /* Degradado del color base hacia una versión más oscura, para dar profundidad */
+    background: linear-gradient(135deg, var(--color-panel), color-mix(in srgb, var(--color-panel), #000 40%));
+    border-top: 1px solid rgb(255 255 255 / .12);
+    transition: flex-grow .7s cubic-bezier(.65, 0, .35, 1);
+  }
+  .panel::-webkit-scrollbar { display: none; }
+  .panel:first-of-type { border-top: 0; }
+
+  .panel__contenido {
+    /* margin auto = centrado vertical que, a diferencia de justify-content: center,
+       no corta el contenido por arriba cuando hay scroll */
+    margin-block: auto;
+    padding-block: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+    max-width: 760px;
+  }
+
+  .panel__titulo {
+    font-family: var(--fuente-titulos);
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.1;
+  }
+  .panel__resumen {
+    font-size: 16px;
+    line-height: 1.4;
+    /* máximo 2 líneas para que el botón siempre quepa en el panel cerrado */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Técnica para animar la altura sin JavaScript: una grilla de 1 fila que pasa de 0fr a 1fr.
+     El hijo directo lleva overflow hidden y min-height 0 para poder encogerse a nada. */
+  .colapsable {
+    display: grid;
+    grid-template-rows: 1fr;
+    width: 100%;
+    transition: grid-template-rows .7s cubic-bezier(.65, 0, .35, 1), opacity .5s ease;
+  }
+  .colapsable > div { overflow: hidden; min-height: 0; }
+
+  /* La información extendida empieza cerrada */
+  .colapsable--extra { grid-template-rows: 0fr; opacity: 0; }
+  .panel.abierto .colapsable--extra { grid-template-rows: 1fr; opacity: 1; }
+
+  /* El panel abierto tampoco repite el resumen: pasa a verse el contenido completo */
+  .panel.abierto .colapsable--resumen { grid-template-rows: 0fr; opacity: 0; }
+
+  .panel__extra {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 8px 0 12px;
+  }
+  /* Estilos del contenido que llega por <slot>: el CSS "scoped" de Astro no lo alcanza,
+     por eso se usa :global() colgado de .panel__extra. */
+  .panel__extra :global(.extra__grupo h3) {
+    font-family: var(--fuente-titulos);
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--orange);
+    margin-bottom: 6px;
+  }
+  .panel__extra :global(ul) { margin: 0; padding-left: 20px; }
+  .panel__extra :global(li) { line-height: 1.5; }
+  .panel__extra :global(p) { line-height: 1.5; }
+
+  /* El estilo base de .boton es global (global.css); aquí solo se ajusta */
+  .panel .boton { cursor: pointer; border: 0; padding: 10px 32px; }
+
+  /* Móvil: paneles apilados. Cada uno mide como mínimo un tercio de la pantalla (así los botones
+     de los cerrados siempre son cómodos de tocar) y el abierto crece lo que pida su contenido:
+     el alto es "auto", no fijo. Si no cabe en la pantalla, la página hace scroll. */
+  @media (max-width: 767px) {
+    .panel,
+    .panel.abierto {
+      flex: 1 0 auto;
+      min-height: calc((100svh - var(--header-alto)) / 3);
+      padding: 0 20px;
+      overflow: visible;
+      transition: none; /* el alargamiento lo anima .colapsable--extra */
+      /* al hacer scroll hacia el panel, que quede justo debajo del header */
+      scroll-margin-top: var(--header-alto);
+    }
+    .panel__contenido { align-items: center; text-align: center; padding-block: 16px; }
+    .panel__extra { align-items: center; }
+    .panel__extra :global(ul) { text-align: left; }
+    /* botones cómodos para el dedo (≥ 44px de alto) */
+    .panel .boton { padding: 13px 36px; font-size: 18px; }
+  }
+
+  /* Desktop: 3 columnas verticales. Al abrir una, se ensancha hacia el lado (60% de la pantalla). */
+  @media (min-width: 768px) {
+    .panel {
+      padding: 0 40px;
+      border-top: 0;
+      border-left: 1px solid rgb(255 255 255 / .12);
+      transition-property: flex-grow;
+    }
+    .panel:first-of-type { border-left: 0; }
+    .panel.abierto { flex-grow: 3; }
+
+    /* Cuando otro panel está abierto, este se comprime: se oculta el resumen */
+    :global(.hay-abierto) .panel:not(.abierto) .colapsable--resumen { grid-template-rows: 0fr; opacity: 0; }
+
+    /* El header flota sobre las columnas: se deja su altura libre arriba */
+    .panel__contenido { padding-top: 110px; padding-bottom: 40px; gap: 14px; }
+    .panel__titulo { font-size: clamp(30px, 2.8vw, 44px); }
+    .panel__resumen { font-size: 18px; -webkit-line-clamp: 4; }
+    .panel .boton { padding: 12px 32px; }
+
+    /* Con el panel ancho, los grupos de información van en 2 columnas */
+    .panel__extra {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px 32px;
+      padding-top: 12px;
+    }
+    .panel__extra :global(.boton) { grid-column: 1 / -1; justify-self: start; }
+  }
+</style>
