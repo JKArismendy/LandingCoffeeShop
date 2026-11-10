@@ -7,6 +7,7 @@
   --orange: #e7650b;
   --verde: #2e4021;
   --blanco: #ffffff;
+  --negro: #000000;
   --fuente-titulos: 'Montserrat', system-ui, sans-serif;
   --fuente-texto: 'Nunito', system-ui, sans-serif;
   --margen-x: 105px;
@@ -14,15 +15,25 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
-/* Scroll snap: el navegador "imanta" cada sección al borde de la pantalla */
-html.snap { scroll-snap-type: y mandatory; }
+html { scroll-behavior: smooth; background: var(--negro); }
+
+/* Scroll snap con contenedor propio (página "snap", la home):
+   html y body ocupan el alto disponible sin scroll, y el scroll ocurre dentro de .snap-container.
+   Así las secciones miden exactamente el área visible, sin depender de vh/dvh ni de la barra de Safari. */
+html.snap, html.snap body { height: 100%; overflow: hidden; }
+.snap-container {
+  height: 100%;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory; /* el navegador "imanta" cada sección al borde */
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
 
 body {
   margin: 0;
   font-family: var(--fuente-texto);
   color: var(--blanco);
-  background: var(--verde);
+  background: var(--negro);
 }
 
 h1, h2, h3, p { margin: 0; }

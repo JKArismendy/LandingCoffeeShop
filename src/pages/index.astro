@@ -11,11 +11,11 @@ import heroTienda from '../assets/hero-tienda.jpg';
   description="Aprende barismo, catación y tueste con profesores certificados por la SCA. Próximamente: tienda de café, equipos y máquinas."
 >
   <SideNav secciones={[{ id: 'academia', etiqueta: 'Academia' }, { id: 'tienda', etiqueta: 'Tienda' }]} />
-  <main>
+  <main class="snap-container">
     <HeroSnap
       id="academia"
       principal
-      kicker="Cafetonato Academia de Café"
+      kicker={['Cafetonato', 'Academia de Café']}
       titulo="Domina el arte y la ciencia del café de especialidad"
       subtitulo="Formación en Barismo, Catación y Tueste"
       etiquetas={['100% Práctico', 'Certificación', 'Cupos Limitados']}

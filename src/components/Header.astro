@@ -47,7 +47,8 @@ import logo from '../assets/logo.svg';
     display: flex;
     justify-content: space-between; /* logo a la izquierda, menú a la derecha */
     align-items: center;
-    padding: 30px calc(var(--margen-x) + 35px); /* mismo margen lateral que el contenido del hero */
+    /* arriba: 30px + la zona de la hora/batería del iPhone (env). Lados: margen del hero + 35px */
+    padding: calc(30px + env(safe-area-inset-top)) calc(var(--margen-x) + 35px) 30px;
   }
 
   .header__logo img {

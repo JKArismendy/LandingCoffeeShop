@@ -4,7 +4,8 @@ import type { ImageMetadata } from 'astro';
 
 interface Props {
   id: string;
-  kicker: string;
+  /** Un texto, o una lista de líneas (se separan con un salto de línea) */
+  kicker: string | string[];
   titulo: string;
   subtitulo: string;
   etiquetas?: string[];
@@ -16,6 +17,7 @@ interface Props {
 }
 const { id, kicker, titulo, subtitulo, etiquetas = [], boton, imagen, alt, principal = false } = Astro.props;
 const Kicker = principal ? 'h1' : 'p';
+const lineasKicker = Array.isArray(kicker) ? kicker : [kicker];
 ---
 <section id={id} class="hero">
   <Image
@@ -30,7 +32,9 @@ const Kicker = principal ? 'h1' : 'p';
     fetchpriority={principal ? 'high' : 'auto'}
   />
   <div class="hero__contenido">
-    <Kicker class="hero__kicker">{kicker}</Kicker>
+    <Kicker class="hero__kicker">
+      {lineasKicker.map((linea, i) => <>{i > 0 && <br />}{linea}</>)}
+    </Kicker>
     <h2 class="hero__titulo">{titulo}</h2>
     <p class="hero__subtitulo">{subtitulo}</p>
     {etiquetas.length > 0 && (
@@ -45,8 +49,9 @@ const Kicker = principal ? 'h1' : 'p';
 <style>
   .hero {
     position: relative;
-    min-height: 100vh;
-    min-height: 100svh;
+    /* 100% del contenedor con scroll (.snap-container), no de la pantalla: siempre calza exacto.
+       Es min-height para que, si el texto no cabe en un teléfono pequeño, la sección crezca. */
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -61,6 +66,18 @@ const Kicker = principal ? 'h1' : 'p';
     height: 100%;
     object-fit: cover;
     z-index: -2;
+  }
+
+  /* Degradados en los bordes: negro → transparente, arriba (hacia abajo) y abajo (hacia arriba).
+     Entre dos secciones las fotos se funden con una franja negra. Alto de cada borde: 48px. */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(to bottom, #000, rgb(0 0 0 / 0)) top / 100% 48px no-repeat,
+      linear-gradient(to top, #000, rgb(0 0 0 / 0)) bottom / 100% 48px no-repeat;
   }
 
   /* Oscurecimiento: negro → transparente, de izquierda a derecha hasta la mitad */
@@ -122,13 +139,33 @@ const Kicker = principal ? 'h1' : 'p';
     font-size: 16px;
   }
 
+  /* Desktop: los bordes exteriores (arriba de la primera sección, abajo de la última) no llevan
+     degradado; solo queda el del medio, donde se unen las dos fotos. */
+  @media (min-width: 768px) {
+    .hero:first-child::before {
+      background: linear-gradient(to top, #000, rgb(0 0 0 / 0)) bottom / 100% 48px no-repeat;
+    }
+    .hero:last-child::before {
+      background: linear-gradient(to bottom, #000, rgb(0 0 0 / 0)) top / 100% 48px no-repeat;
+    }
+  }
+
   /* Móvil: el oscurecimiento cubre toda la pantalla y el contenido va a lo ancho */
   @media (max-width: 767px) {
     .hero::after { background: rgb(0 0 0 / .6); }
-    .hero__contenido { margin-right: var(--margen-x); max-width: none; padding-top: 80px; }
+
+    /* Todo centrado en móvil: align-items centra los bloques (botón, etiquetas) y
+       text-align centra las líneas de texto (lo heredan kicker, título y subtítulo). */
+    .hero__contenido {
+      margin-right: var(--margen-x);
+      max-width: none;
+      padding-top: 80px;
+      align-items: center;
+      text-align: center;
+    }
     .hero__kicker { font-size: 22px; }
     .hero__titulo { font-size: 34px; line-height: 42px; }
     .hero__subtitulo { font-size: 18px; line-height: 30px; }
-    .hero__etiquetas { justify-content: flex-start; }
+    .hero__etiquetas { justify-content: center; }
   }
 </style>
