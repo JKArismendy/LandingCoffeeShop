@@ -7,8 +7,10 @@ interface Props {
   description: string;
   snap?: boolean;
   image?: string;
+  /** Header para fondo claro (ver Header.astro) */
+  headerClaro?: boolean;
 }
-const { title, description, snap = false, image = '/og-image.jpg' } = Astro.props;
+const { title, description, snap = false, image = '/og-image.jpg', headerClaro = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(image, Astro.site);
 ---
@@ -34,7 +36,7 @@ const ogImage = new URL(image, Astro.site);
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
-    <Header />
+    <Header claro={headerClaro} />
     <slot />
     <script>
       // Fade-in al entrar en pantalla (equivale al "scrollIn / fade" del diseño).

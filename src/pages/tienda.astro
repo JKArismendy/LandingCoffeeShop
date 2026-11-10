@@ -1,20 +1,253 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+// Todo el contenido es de ejemplo (placeholders) hasta que se monte la tienda real.
+const categorias = ['Todo', 'Café', 'Equipos', 'Máquinas', 'Accesorios'];
+
+const productos = Array.from({ length: 8 }, (_, i) => ({
+  nombre: 'Nombre del producto',
+  categoria: categorias[(i % 4) + 1],
+  precio: '$ 00.000',
+  etiqueta: i === 0 ? 'Nuevo' : i === 3 ? 'Oferta' : '',
+}));
+
+const beneficios = [
+  { titulo: 'Envíos a todo el país', texto: 'Lorem ipsum dolor sit amet.' },
+  { titulo: 'Pagos seguros', texto: 'Lorem ipsum dolor sit amet.' },
+  { titulo: 'Asesoría de baristas', texto: 'Lorem ipsum dolor sit amet.' },
+];
 ---
 <Layout
-  title="Tienda | Próximamente | Cafetonato"
-  description="Muy pronto: café, equipos y máquinas de Cafetonato."
+  headerClaro
+  title="Cafetonato Coffee Shop | Café, equipos y máquinas"
+  description="Muy pronto: café de especialidad, equipos y máquinas de Cafetonato Coffee Shop."
 >
-  <main>
-    <h1>Tienda</h1>
-    <p>Próximamente. [mensaje por definir]</p>
-    <a class="boton" href="/">Volver al inicio</a>
+  <main class="tienda">
+    <!-- Aviso: deja claro que es una maqueta -->
+    <p class="aviso">Tienda en construcción: los productos y precios son de ejemplo.</p>
+
+    <!-- Portada de la tienda -->
+    <section class="portada">
+      <h1 class="portada__titulo">Cafetonato Coffee Shop</h1>
+      <p class="portada__texto">[texto por definir]: café de especialidad, equipos y máquinas para tu barra.</p>
+      <span class="portada__insignia">Próximamente</span>
+    </section>
+
+    <!-- Barra de herramientas de la tienda: buscador y categorías (aún sin función) -->
+    <section class="barra" aria-label="Buscar y filtrar productos">
+      <label class="buscador">
+        <span class="sr-only">Buscar productos</span>
+        <input type="search" placeholder="Buscar productos…" disabled />
+      </label>
+      <ul class="categorias">
+        {categorias.map((c, i) => (
+          <li><button type="button" class:list={['chip', { activo: i === 0 }]} disabled>{c}</button></li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Cuadrícula de productos -->
+    <section class="productos" aria-labelledby="titulo-destacados">
+      <h2 id="titulo-destacados" class="seccion__titulo">Productos destacados</h2>
+      <ul class="grilla">
+        {productos.map((p) => (
+          <li class="producto">
+            <div class="producto__imagen" role="img" aria-label="Imagen del producto (pendiente)">
+              {p.etiqueta && <span class="producto__etiqueta">{p.etiqueta}</span>}
+              <span class="producto__imagen-texto">Imagen</span>
+            </div>
+            <div class="producto__info">
+              <p class="producto__categoria">{p.categoria}</p>
+              <h3 class="producto__nombre">{p.nombre}</h3>
+              <p class="producto__precio">{p.precio}</p>
+              <button class="boton" type="button" disabled>Agregar al carrito</button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Beneficios -->
+    <section class="beneficios" aria-label="Beneficios de comprar en Cafetonato">
+      {beneficios.map((b) => (
+        <div class="beneficio">
+          <span class="beneficio__icono" aria-hidden="true"></span>
+          <h3>{b.titulo}</h3>
+          <p>{b.texto}</p>
+        </div>
+      ))}
+    </section>
   </main>
 </Layout>
 
 <style>
-  main { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 24px; padding: 0 var(--margen-x); }
-  h1 { font-family: var(--fuente-titulos); font-size: 64px; font-weight: 700; }
-  p { font-size: 22px; }
-  @media (max-width: 767px) { h1 { font-size: 56px; } main { align-items: center; text-align: center; } }
+  /* Colores propios de esta página: fondo hueso (blanco amarillento) y texto en tinta café oscuro.
+     Se declaran en :root para que también pinten html y body (si no, asoma el negro al hacer scroll). */
+  :global(:root) { --hueso: #f5eedc; --tinta: #2a2118; }
+  :global(html), :global(body) { background: var(--hueso); }
+
+  .tienda {
+    background: var(--hueso);
+    color: var(--tinta);
+    /* el header es fijo y flota encima: se deja su altura libre */
+    padding: 120px var(--margen-x) 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* El header de esta página usa su modo claro (prop headerClaro en <Layout>): ver Header.astro */
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .aviso {
+    align-self: flex-start;
+    padding: 6px 14px;
+    border: 1px dashed rgb(42 33 24 / .4);
+    border-radius: 8px;
+    font-size: 14px;
+    opacity: .85;
+  }
+
+  /* Portada */
+  .portada {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 56px 40px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--verde), color-mix(in srgb, var(--verde), #000 55%));
+    color: var(--blanco); /* la portada sigue oscura, con texto blanco */
+  }
+  .portada__titulo {
+    font-family: var(--fuente-titulos);
+    font-weight: 700;
+    font-size: clamp(36px, 6vw, 72px);
+    line-height: 1.05;
+  }
+  .portada__texto { font-size: 20px; line-height: 1.5; max-width: 560px; }
+  .portada__insignia {
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: var(--orange);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  /* Buscador y categorías */
+  .barra { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; }
+  .buscador { flex: 1 1 260px; max-width: 420px; }
+  .buscador input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid rgb(42 33 24 / .3);
+    border-radius: 8px;
+    background: rgb(255 255 255 / .6);
+    color: var(--tinta);
+    font: inherit;
+  }
+  .buscador input::placeholder { color: rgb(42 33 24 / .55); }
+  .categorias { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .chip {
+    padding: 8px 18px;
+    border: 1px solid rgb(42 33 24 / .35);
+    border-radius: 999px;
+    background: none;
+    color: var(--tinta);
+    font: inherit;
+    font-size: 15px;
+  }
+  .chip.activo { background: var(--tinta); color: var(--hueso); border-color: var(--tinta); }
+  .chip:disabled, .buscador input:disabled { cursor: not-allowed; }
+
+  /* Productos */
+  .seccion__titulo {
+    font-family: var(--fuente-titulos);
+    font-weight: 700;
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+  .grilla {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .producto {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgb(42 33 24 / .14);
+    border-radius: 12px;
+    background: rgb(255 255 255 / .65);
+    overflow: hidden;
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .producto:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgb(42 33 24 / .15); }
+  .producto__imagen {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, #e6dcc1, #d3c7a6);
+    color: rgb(42 33 24 / .45);
+    font-size: 18px;
+  }
+  .producto__etiqueta {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--orange);
+    color: var(--blanco);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .producto__info { display: flex; flex-direction: column; gap: 6px; padding: 16px; }
+  .producto__categoria { font-size: 13px; opacity: .65; text-transform: uppercase; letter-spacing: .06em; }
+  .producto__nombre { font-family: var(--fuente-titulos); font-weight: 600; font-size: 18px; }
+  .producto__precio { font-size: 20px; font-weight: 700; color: var(--orange); margin-bottom: 8px; }
+  .producto .boton { width: 100%; padding: 12px 16px; font-size: 16px; border: 0; cursor: not-allowed; opacity: .55; }
+  .producto .boton:hover { transform: none; filter: none; }
+
+  /* Beneficios */
+  .beneficios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .beneficio {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 24px;
+    border: 1px solid rgb(42 33 24 / .14);
+    border-radius: 12px;
+    background: rgb(255 255 255 / .45);
+  }
+  .beneficio__icono { width: 40px; height: 40px; border-radius: 50%; background: var(--orange); opacity: .85; }
+  .beneficio h3 { font-family: var(--fuente-titulos); font-weight: 600; font-size: 18px; }
+  .beneficio p { opacity: .75; }
+
+  @media (max-width: 767px) {
+    .tienda { padding: calc(108px + env(safe-area-inset-top)) 20px 48px; gap: 32px; }
+    .portada { padding: 36px 24px; align-items: center; text-align: center; }
+    .portada__texto { font-size: 17px; }
+    .buscador { max-width: none; }
+    .seccion__titulo { font-size: 26px; }
+    .grilla { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .producto__info { padding: 12px; }
+    .producto__nombre { font-size: 15px; }
+    .producto__precio { font-size: 17px; }
+    .producto .boton { font-size: 14px; padding: 12px 8px; }
+    .beneficios { grid-template-columns: 1fr; }
+  }
 </style>

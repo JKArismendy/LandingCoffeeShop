@@ -1,7 +1,13 @@
 ---
 import logo from '../assets/logo.svg';
+
+interface Props {
+  /** Para páginas de fondo claro que hacen scroll: logo a color, menú oscuro y header no fijo */
+  claro?: boolean;
+}
+const { claro = false } = Astro.props;
 ---
-<header class="header">
+<header class:list={['header', { 'header--claro': claro }]}>
   <a class="header__logo" href="/" aria-label="Cafetonato, ir al inicio">
     <img src={logo.src} alt="Cafetonato" width="64" height="60" />
   </a>
@@ -120,4 +126,15 @@ import logo from '../assets/logo.svg';
     .header.abierto .header__toggle span:nth-child(2) { opacity: 0; }
     .header.abierto .header__toggle span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
   }
+
+  /* Modo claro (fondo hueso en la tienda). Va al final y dentro del mismo componente para que
+     sus selectores tengan más peso que los de arriba. */
+  .header--claro { position: absolute; } /* se va con el scroll en vez de encimarse al contenido */
+  .header--claro .header__logo img { filter: none; } /* logo con sus colores originales */
+  .header--claro .header__nav a { color: var(--tinta, #2a2118); text-shadow: none; }
+  .header--claro .header__nav a:hover { color: var(--orange); }
+  .header--claro .header__toggle span { background: var(--tinta, #2a2118); }
+  /* Menú móvil abierto: su panel es oscuro, así que vuelve el blanco */
+  .header--claro.abierto .header__nav a { color: var(--blanco); }
+  .header--claro.abierto .header__toggle span { background: var(--blanco); }
 </style>
