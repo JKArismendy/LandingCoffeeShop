@@ -1,6 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CursoPanel from '../components/CursoPanel.astro';
+import fotoBarismo from '../assets/formacion/curso-barismo.jpg';
+import fotoCatacion from '../assets/formacion/curso-catacion.jpg';
+import fotoTueste from '../assets/formacion/curso-tueste.jpg';
 
 const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.';
 ---
@@ -16,6 +19,7 @@ const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do e
       titulo="Barismo"
       resumen="Aprende técnicas de preparación de café, espresso, arte latte y servicio al cliente."
       color="#2e4021"
+      imagen={fotoBarismo}
     >
       <div class="extra__grupo">
         <h3>Módulo teórico</h3>
@@ -55,7 +59,7 @@ const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do e
       </div>
     </CursoPanel>
 
-    <CursoPanel id="catacion" titulo="Catación" resumen={lorem} color="#5a3a1e">
+    <CursoPanel id="catacion" titulo="Catación" resumen={lorem} color="#5a3a1e" imagen={fotoCatacion}>
       <div class="extra__grupo">
         <h3>Módulos</h3>
         <ul>
@@ -74,7 +78,7 @@ const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do e
       </div>
     </CursoPanel>
 
-    <CursoPanel id="tueste" titulo="Tueste" resumen={lorem} color="#7a2e12">
+    <CursoPanel id="tueste" titulo="Tueste" resumen={lorem} color="#7a2e12" imagen={fotoTueste}>
       <div class="extra__grupo">
         <h3>Módulos</h3>
         <ul>

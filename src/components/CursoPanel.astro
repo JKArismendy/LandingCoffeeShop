@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import { whatsappLink } from '../config';
 
 interface Props {
@@ -6,12 +8,31 @@ interface Props {
   titulo: string;
   /** Frase corta, siempre visible (salvo cuando otro panel está abierto) */
   resumen: string;
-  /** Color de fondo provisional (hasta que haya fotos) */
+  /** Color del curso: tiñe la foto (modo de fusión) y es el fondo del panel */
   color: string;
+  /** Foto del curso; se funde con el color */
+  imagen: ImageMetadata;
+  /** Descripción de la foto. Vacío = decorativa (el título ya dice de qué trata el panel) */
+  alt?: string;
 }
-const { id, titulo, resumen, color } = Astro.props;
+const { id, titulo, resumen, color, imagen, alt = '' } = Astro.props;
 ---
 <section id={id} class="panel" style={`--color-panel: ${color}`}>
+  <!-- Foto de fondo. El color del panel (.panel background) queda DEBAJO y la foto se funde con él
+       mediante mix-blend-mode, así cada curso tiene su propio tinte. -->
+  <div class="panel__fondo" aria-hidden="true">
+    <Image
+      src={imagen}
+      alt={alt}
+      widths={[640, 1024, 1600]}
+      sizes="(min-width: 768px) 60vw, 100vw"
+      format="webp"
+      quality={70}
+      loading="lazy"
+    />
+  </div>
+
+  <div class="panel__scroll">
   <div class="panel__contenido">
     <h2 class="panel__titulo">{titulo}</h2>
 
@@ -44,6 +65,7 @@ const { id, titulo, resumen, color } = Astro.props;
       Ver más
     </button>
   </div>
+  </div>
 </section>
 
 <script>
@@ -59,7 +81,7 @@ const { id, titulo, resumen, color } = Astro.props;
     boton.setAttribute('aria-expanded', String(abierto));
     boton.textContent = abierto ? 'Ver menos' : 'Ver más';
     extra.inert = !abierto;
-    if (abierto) panel.scrollTop = 0;
+    if (abierto) panel.querySelector<HTMLElement>('.panel__scroll')!.scrollTop = 0;
   }
 
   paneles.forEach((panel) => {
@@ -88,18 +110,58 @@ const { id, titulo, resumen, color } = Astro.props;
     flex-direction: column;
     min-height: 0;
     min-width: 0;
-    padding: 0 var(--margen-x);
-    /* Si el contenido no cabe, el panel hace scroll (sin barra visible) en vez de recortar el botón */
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: none;
-    /* Degradado del color base hacia una versión más oscura, para dar profundidad */
+    position: relative;
+    /* isolation: la foto se mezcla solo con el fondo de ESTE panel, no con lo que haya detrás */
+    isolation: isolate;
+    /* Degradado del color base hacia una versión más oscura, para dar profundidad.
+       Es el "fondo" (backdrop) sobre el que se funde la foto. */
     background: linear-gradient(135deg, var(--color-panel), color-mix(in srgb, var(--color-panel), #000 40%));
     border-top: 1px solid rgb(255 255 255 / .12);
     transition: flex-grow .7s cubic-bezier(.65, 0, .35, 1);
   }
-  .panel::-webkit-scrollbar { display: none; }
   .panel:first-of-type { border-top: 0; }
+
+  /* Foto de fondo con modo de fusión. Cubre todo el panel y no se mueve si el contenido hace scroll. */
+  .panel__fondo {
+    position: absolute;
+    inset: 0;
+    /* OJO: sin z-index. Con z-index (p. ej. -1) este div crearía su propio contexto de apilamiento
+       y la foto ya no se mezclaría con el color del panel. El contenido se sube con .panel__scroll. */
+    overflow: hidden;
+  }
+  .panel__fondo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* 1) Se pasa a blanco y negro para que solo aporte luz y sombra, no sus propios colores.
+       2) mix-blend-mode: luminosity → conserva la luminosidad de la foto y toma el tono y la
+          saturación del color del panel que tiene debajo (efecto de tamizado/duotono). */
+    filter: grayscale(1) contrast(1.1);
+    mix-blend-mode: luminosity;
+  }
+  /* Velo oscuro encima: sube el contraste del texto blanco y entona más con la marca */
+  .panel__fondo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgb(0 0 0 / .35), rgb(0 0 0 / .65));
+  }
+
+  /* Contenedor interior con el scroll y los márgenes laterales (antes los tenía .panel) */
+  .panel__scroll {
+    position: relative;
+    z-index: 1; /* por encima de la foto */
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0 var(--margen-x);
+    /* Si el contenido no cabe, hace scroll (sin barra visible) en vez de recortar el botón */
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+  }
+  .panel__scroll::-webkit-scrollbar { display: none; }
 
   .panel__contenido {
     /* margin auto = centrado vertical que, a diferencia de justify-content: center,
@@ -178,12 +240,12 @@ const { id, titulo, resumen, color } = Astro.props;
     .panel.abierto {
       flex: 1 0 auto;
       min-height: calc((100svh - var(--header-alto)) / 3);
-      padding: 0 20px;
-      overflow: visible;
       transition: none; /* el alargamiento lo anima .colapsable--extra */
       /* al hacer scroll hacia el panel, que quede justo debajo del header */
       scroll-margin-top: var(--header-alto);
     }
+    /* En móvil el panel crece con su contenido, así que el scroll interior no hace falta */
+    .panel__scroll { flex: 1 0 auto; padding: 0 20px; overflow: visible; }
     .panel__contenido { align-items: center; text-align: center; padding-block: 16px; }
     .panel__extra { align-items: center; }
     .panel__extra :global(ul) { text-align: left; }
@@ -193,8 +255,8 @@ const { id, titulo, resumen, color } = Astro.props;
 
   /* Desktop: 3 columnas verticales. Al abrir una, se ensancha hacia el lado (60% de la pantalla). */
   @media (min-width: 768px) {
+    .panel__scroll { padding: 0 40px; }
     .panel {
-      padding: 0 40px;
       border-top: 0;
       border-left: 1px solid rgb(255 255 255 / .12);
       transition-property: flex-grow;
